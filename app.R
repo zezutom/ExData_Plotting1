@@ -8,7 +8,7 @@
 source_r <- function(...) {
   scripts <- c(...)
   lapply(scripts, function(script) {
-    source(file.path("R", paste(script, "R", sep = ".")))
+    source(file.path(paste(script, "R", sep = ".")))
   })
 }
 
