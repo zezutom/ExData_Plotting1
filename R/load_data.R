@@ -15,21 +15,41 @@ load_dataset <- function() {
   }
   
   # Load the content into a data frame
-  df <- read.table(
+  #
+  # This is to make it as efficient as possible, assuming we are okay with using 'read.table'
+  # see Reading large tables into R: 
+  # http://www.biostat.jhsph.edu/~rpeng/docs/R-large-tables.html
+  #
+  # Alternatively, we could make use of 'fread' or 'sqldf'
+  #
+  # I couldn't find a way of how to apply a filter while reading the data. 
+  # Open to suggestions (yeah, I know about sqldf, but would prefer something more straightforward).
+
+  # Optimization #1: Determine column classes using a small dataset
+  tab5rows <- read.table(source_txt, header = TRUE, nrows = 5,  sep = ";", na.strings = c("?"))
+  classes <- sapply(tab5rows, class)
+  
+  # Optimization #2: Specify the total number of rows, if you happen to know them
+  rowcount <- 2075259
+  
+  # Now, read the whole table
+  tabAll <- read.table(
           source_txt, 
           header = TRUE,
+          colClasses = classes,
+          nrows = rowcount,
           sep = ";",
           na.strings = c("?"))
   
   # Convert the Date and Time variables to Date/Time classes
-  df$Time <- strptime(paste(df$Date, df$Time, sep = " "), "%d/%m/%Y %H:%M:%S")
-  df$Date <- as.Date(df$Date, "%d/%m/%Y")
+  tabAll$Date <- as.Date(tabAll$Date, "%d/%m/%Y")
+  tabAll$Time <- strptime(tabAll$Time, "%H:%M:%S")
   
   # We will only be using data from the dates 2007-02-01 and 2007-02-02
   date_range <- as.Date(c("2007-02-01", "2007-02-02"), "%Y-%m-%d")
-  df <- subset(df, Date %in% date_range)
+  tabAll <- subset(tabAll, Date %in% date_range)
   
-  return (df)
+  return (tabAll)
 }
 
 
