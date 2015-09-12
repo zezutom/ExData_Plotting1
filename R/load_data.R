@@ -42,8 +42,10 @@ load_dataset <- function() {
           na.strings = c("?"))
   
   # Convert the Date and Time variables to Date/Time classes
+  # Keep timestamp as stuff happens during the day and you want to plot it
+  timestamp <- paste(tabAll$Date, tabAll$Time);
   tabAll$Date <- as.Date(tabAll$Date, "%d/%m/%Y")
-  tabAll$Time <- strptime(tabAll$Time, "%H:%M:%S")
+  tabAll$Time <- strptime(timestamp, "%d/%m/%Y %H:%M:%S")
   
   # We will only be using data from the dates 2007-02-01 and 2007-02-02
   date_range <- as.Date(c("2007-02-01", "2007-02-02"), "%Y-%m-%d")
